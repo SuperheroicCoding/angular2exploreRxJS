@@ -27,7 +27,8 @@ var barrels = [
     // App specific barrels.
     'app',
     'app/shared',
-    'app/+backpressure'
+    'app/+backpressure',
+    'app/+mario',
 ];
 var cliSystemConfigPackages = {};
 barrels.forEach(function (barrelName) {
