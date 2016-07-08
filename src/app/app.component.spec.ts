@@ -16,8 +16,8 @@ describe('App: ExploreRxJS', () => {
     expect(app).toBeTruthy();
   }));
 
-  it('should have as title \'app works!\'',
+  it('should have as title \'Explore RxJs!\'',
       inject([AppComponent], (app: AppComponent) => {
-    expect(app.title).toEqual('app works!');
+    expect(app.title).toEqual('Explore RxJs!');
   }));
 });
