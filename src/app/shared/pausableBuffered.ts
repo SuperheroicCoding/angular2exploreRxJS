@@ -1,15 +1,16 @@
-import {Observable, Subject} from 'rxjs/Rx';
+import {Observable} from 'rxjs/Observable';
+import {Subject} from 'rxjs/Subject';
 import 'rxjs/add/operator/buffer';
 
 declare module 'rxjs/Observable' {
   interface Observable<T> {
-    pausableBuffered: (pauseResumeNotifier: Observable<boolean>) => Observable<T>;
+    pausableBuffered: (pauseSignal$: Observable<boolean>) => Observable<T>;
   }
 }
 
-export function pausableBuffered(pauseSignalObservable) {
+export function pausableBuffered<T>(pauseSignalObservable) {
   return Observable.create(subscriber => {
-    let source = this;
+    let source: Subject<T> = this;
 
     let isEnabled = false;
     let closeBuffer = new Subject();

@@ -1,10 +1,11 @@
-import {Component, HostListener, EventEmitter, AfterViewInit} from '@angular/core';
+import {Component, HostListener, EventEmitter} from '@angular/core';
 import 'rxjs/add/operator/scan';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/operator/count';
 import 'rxjs/add/operator/zip';
-import 'rxjs/add/operator/publish';
+import 'rxjs/add/operator/share';
+
 import '../shared/pausableBuffered';
 
 @Component({
@@ -26,30 +27,27 @@ import '../shared/pausableBuffered';
 })
 export class BackpressureComponent {
 
-
   private mousemove$;
   private losslessToggleSource$;
   private losslessToggle$;
 
   private countMouseMoves$;
   private pausableMousemoves$;
-  private mouseMovedPublished$;
+  private mouseMovedShared$;
 
   // noinspection TypeScriptUnresolvedFunction
   constructor() {
     this.mousemove$ = new EventEmitter<MouseEvent>();
     this.losslessToggleSource$ = new EventEmitter();
     this.losslessToggle$ = this.losslessToggleSource$.startWith(true);
-    this.mouseMovedPublished$ = this.mousemove$.publish();
-    this.countMouseMoves$ = this.mouseMovedPublished$.scan((acc) => acc + 1, 0);
+    this.mouseMovedShared$ = this.mousemove$.share();
+    this.countMouseMoves$ = this.mouseMovedShared$.scan((acc) => acc + 1, 0);
 
-    this.pausableMousemoves$ = this.mouseMovedPublished$
-      .do(this.log)
-      .map((e) => 'clientX: ' + e.clientX + ', clientY: ' + e.clientY)
+    this.pausableMousemoves$ = this.mouseMovedShared$
+      .map((e: MouseEvent) => 'clientX: ' + e.clientX + ', clientY: ' + e.clientY)
       .zip(this.countMouseMoves$, (eventString, count) => 'EventNo: ' + count + ' ' + eventString)
       .pausableBuffered(this.losslessToggle$)
       .scan((previous, item) => [item].concat(previous), []);
-      this.mouseMovedPublished$.connect();
   }
 
   @HostListener('mousemove', ['$event'])
